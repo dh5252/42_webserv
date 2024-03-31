@@ -1,7 +1,7 @@
 #ifndef REQUEST_HPP
 # define REQUEST_HPP
 
-class	request {
+class	request : public cahn {
 	private:
 		std::string							method;
 		std::string							path;
@@ -12,6 +12,9 @@ class	request {
 
 	public:
 		request();
+		void	parseReq();
+		void	parseStartLine();
+		void	parseHeaders();
 };
 
 #endif

@@ -8,7 +8,4 @@ enum HttpMethod
     DELETE
 };
 
-
-
-
 #endif

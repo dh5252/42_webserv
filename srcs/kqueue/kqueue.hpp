@@ -23,6 +23,7 @@ class Kqueue {
 private:
     int kqueue_fd;
     std::vector<Server*> servers;
+    std::vector<struct kevent> change_list;
 
 public:
     Kqueue();

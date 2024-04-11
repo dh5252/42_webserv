@@ -2,6 +2,7 @@
 
 request::request()
 {
+	status = 200;
 }
 
 void	request::parseReq(std::string raw) //raw contents가 있다 치고
@@ -22,10 +23,10 @@ void	request::parseReq(std::string raw) //raw contents가 있다 치고
 		this->body += body;
 	//body가 있어야 하고 있는데 content-length가 없으면
 	if (this->isBody && !this->body.empty() && this->headers.count("Content-Length") == 0)
-		error 411(Length Reuired);
+		status = 411;//(Length Reuired)
 	//body 있어야 하는데 없으면
 	if (this->isBody && this->body.empty())
-		error 400;
+		status = 400;//Bad Request
 }
 
 void	request::parseStartLine(std::string	startLine)
@@ -33,16 +34,16 @@ void	request::parseStartLine(std::string	startLine)
 	std::stringstream	ss(startLine);
 
 	if (startLineIsTooLong) //그런데 스트링은 그냥 다 받아주는 것 아닌가? octets 8000길이 지원 권
-		error 501;
+		status = 501;//Not Implemented
 	if (invalid)//invalid한 경우는? 빈칸이거나 경로가 아니거나 버전이 아니거나. 메소드는 아래서 한번에 처리?
-		error 400 or 301 redirect;
+		status = 400; // or 301(Moved Permanently) redirect
 	ss >> this->method >> this->path >> this->version;
 	if (this->method != "GET" && this->method != "POST" && this->method != "DELETE")
-		error 501;
+		status = 501;
 	if (this->method == "POST")
 		this->isBody = 1;
 	if (pathTooLong)
-		error 414;
+		status = 414;//URI Too Long
 	//예외?
 }
 
@@ -61,10 +62,10 @@ void	request::parseHeaders(std::istringstream is)
 			key = header.substr(0, pos);
 			//field_name에 공백 있으면 에러
 			if (key.find_first_of(" \t\n\r") != std::string::npos)
-				error 400;
+				status = 400;
 			//field_name 너무 크
 			if (keyTooLong)
-				error 4xx(client error);
+				status = 400;//4xx(client error)
 			//선택적 공백 고려해서 value 뽑기
 			if (header[pos+1] == ' ')
 				value = header.substr(pos + 2);
@@ -73,7 +74,7 @@ void	request::parseHeaders(std::istringstream is)
 			//Content-Length가 여러개인지
 			if (key == "Content-Length" && this->headers.find("Content-Length") && 
 					this->headers[key] != value)
-				error 400;
+				status = 400;
 		}
 		else if (pos = header.find_first_not_of(" \t") != std::string::npos) //헤더가 여러줄로 나뉘어 있으면
 		{
@@ -86,7 +87,7 @@ void	request::parseHeaders(std::istringstream is)
 	while (std::getline(is, header) && header == "\r\n\r\n")
 		;
 	if (pos = header.find(':') != std::string::npos)
-		error 400;
+		status = 400;
 	 //둘 다 있으면  content-length 지우
 	if (this->headers.count("Transfer-Encoding") && this->headers.count("Content-Length"))
 		this->headers.erase("Content-Length");

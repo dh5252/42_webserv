@@ -6,12 +6,13 @@
 
 class	request : public cahn {
 	private:
-		std::string							method;
-		std::string							path;
-		std::string							version;
+		int												status;
+		std::string										method;
+		std::string										path;
+		std::string										version;
 		std::unordered_map<std::string, std::string>	headers;
-		int									isBody;
-		std::string							body;
+		int												isBody;
+		std::string										body;
 
 	public:
 		request();

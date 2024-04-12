@@ -9,6 +9,7 @@ class	request : public cahn {
 		int												status;
 		std::string										method;
 		std::string										path;
+		std::unordered_map<std::string, std::string>	query;
 		std::string										version;
 		std::unordered_map<std::string, std::string>	headers;
 		int												isBody;
@@ -18,6 +19,7 @@ class	request : public cahn {
 		request();
 		void	parseReq();
 		void	parseStartLine();
+		void	parseURI();
 		void	parseHeaders();
 };
 

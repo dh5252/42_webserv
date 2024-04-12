@@ -45,6 +45,30 @@ void	request::parseStartLine(std::string	startLine)
 	if (pathTooLong)
 		status = 414;//URI Too Long
 	//예외?
+	parseURI(this->path);
+}
+
+void	request::parseURI(std::string path)
+{
+	size_t	pos = path.find('?');
+	if (pos == std::string::npos)
+		return ;
+
+	std::string	rawQuery = path.substr(pos+1);
+	std::string	tmp, key, value;
+	while (!rawQuery.empty() && pos = rawQuery.find('&') != std::string::npos)
+	{
+		tmp = rawQuery.substr(0, pos);
+		rawQuery.erase(0, pos+1);
+		if (pos = tmp.find('=') == std::string::npos)
+		{
+			status = 400;
+			break ;
+		}
+		key = tmp.substr(0, pos);
+		value = tmp.substr(pos + 1);//key value 에러 검사 필요?
+		this->query[key] = value;
+	}
 }
 
 void	request::parseHeaders(std::istringstream is)
